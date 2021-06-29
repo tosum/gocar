@@ -6,7 +6,7 @@ import time
 from intersection import Intersection, CarCrashException
 from graphics import Graphics
 from direction import Direction, directions
-from car import CarStatistic
+from car import CarStatistic, profiles
 
 if __name__ == "__main__":
     road_len = 5
@@ -23,7 +23,11 @@ if __name__ == "__main__":
         while dir_from == dir_to:
             dir_to = random.choice(directions)
 
-        intersection.add_car(dir_from, dir_to, 0, 0)
+        points = random.randint(5, 15)
+
+        profile = random.choice(profiles)
+
+        intersection.add_car(dir_from, 0, dir_to, 1, profile, points)
 
     states = [intersection.copy()]
     stats = []

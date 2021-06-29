@@ -11,6 +11,14 @@ class Profile(Enum):
     Frustrated = 3, # Red
     Altruistic = 4  # Blue
 
+profiles = [
+    Profile.Righteous,
+    Profile.Hoarder,
+    Profile.Nervous,
+    Profile.Frustrated,
+    Profile.Altruistic
+]
+
 class CarStatistic:
     def __init__(self, car):
         self.speed = car.speed
@@ -19,7 +27,7 @@ class CarStatistic:
         self.haste = car.haste
 
 class Car:
-    def __init__(self, car_id, start_dir, target_dir, start_rest, target_rest, mid):
+    def __init__(self, start_dir, start_rest, target_dir, target_rest, profile, points, car_id, mid):
         self.car_id = car_id
         self.start_dir = start_dir
         self.target_dir = target_dir
@@ -31,8 +39,9 @@ class Car:
         # start and target get swapped once a car reaches its destination
         
         self.mid = mid
-        self.haste = 0
-        self.profile = Profile.Righteous
+        self.haste = random.randint(0, 5)
+        self.profile = profile
+        self.points = points
 
         self.pos = self.start_pos
         self.speed = 0

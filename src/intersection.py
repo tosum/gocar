@@ -1,6 +1,7 @@
-from car import Car
+from car import Car, Profile
 from direction import Direction, directions
 from copy import deepcopy
+import random
 
 class CarCrashException(Exception):
     pass
@@ -56,12 +57,12 @@ class Intersection:
         elif direction == Direction.Left:
             return (small, mid1)
 
-    def add_car(self, from_dir, to_dir, start_rest, target_rest):
+    def add_car(self, from_dir, start_rest, to_dir, target_rest, profile, points):
         start_pos = self.get_start_pos(from_dir)
         target_pos = self.get_target_pos(to_dir)
         mid = 4 * self.road_len + 2
 
-        new_car = Car(self.num_cars, from_dir, to_dir, start_rest, target_rest, mid)
+        new_car = Car(from_dir, start_rest, to_dir, target_rest, profile, points, self.num_cars, mid)
         new_car.start_pos = start_pos
         new_car.target_pos = target_pos
 
@@ -89,6 +90,7 @@ class Intersection:
                 if min_car_time <= self.time:
                     self.start_queues[start_dir].remove((min_car_time, min_car))
                     min_car.pos = min_car.start_pos
+                    min_car.haste = random.randint(0, 5)
                     self.active_cars.append(min_car)
 
         crash = False
