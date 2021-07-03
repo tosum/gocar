@@ -10,10 +10,10 @@ pip3 install -r requirements.txt
 
 ## Running
 ```bash
-./run.sh < example.in
+./run.sh < examples/example.in
 
 # or simply
-python3 src/main.py < example.in
+python3 src/main.py < examples/example.in
 ```
 
 ## Visualisation colors
