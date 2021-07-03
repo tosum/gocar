@@ -1,7 +1,7 @@
 from enum import Enum
 import pygame
 from pygame import Vector2
-
+import time
 from direction import Direction
 
 class Input(Enum):
@@ -32,7 +32,7 @@ class Graphics:
         self.polygon = self.generate_polygon()
 
         self.car_size = self.get_car_size()
-        self.car_speed_font = pygame.font.SysFont(None, int(self.car_size * 0.8))
+        self.car_priority_font = pygame.font.SysFont(None, int(self.car_size * 0.8))
         self.info_font = pygame.font.SysFont(None, int(self.car_size * 0.6))
 
     def generate_lines(self):
@@ -78,8 +78,8 @@ class Graphics:
 
         return 0.8 * abs(pos1[0] - pos2[0])
 
-    def draw_car_speed(self, car):
-        img = self.car_speed_font.render(str(car.speed), True, inverse_color(car.color))
+    def draw_car_priority(self, car):
+        img = self.car_priority_font.render(str(car.priority), True, inverse_color(car.color))
         pos = self.inter_to_screen(car.pos)
         x = pos[0] - img.get_size()[0] / 2
         y = pos[1] - img.get_size()[1] / 2
@@ -117,7 +117,7 @@ class Graphics:
             pygame.draw.lines(self.screen, inverse_color(car.color), False, [arr1, top, arr2], width = 5)
 
             # Draw car speed
-            self.draw_car_speed(car)
+            self.draw_car_priority(car)
 
         state_info_img = self.info_font.render(state_info, True, (255, 255, 255))
         speed_info_img = self.info_font.render(speed_info, True, (255, 255, 255))
@@ -145,5 +145,67 @@ class Graphics:
 
         return (x, y)
 
-    def handle_input(self):
-        pass
+    def run(self, states):
+        running = True
+
+        playing = True
+        accumulated_time = 0
+        state_time = 0.15
+        cur_state = 0
+        play_speed = 1.0
+
+        start_time = time.time()
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        running = False
+
+                    if event.key == pygame.K_RIGHT:
+                        cur_state = cur_state + 1
+                        if cur_state == len(states):
+                            cur_state = 0
+
+                    if event.key == pygame.K_LEFT:
+                        cur_state = cur_state - 1
+                        if cur_state < 0:
+                            cur_state = len(states) - 1
+
+                    if event.key == pygame.K_SPACE:
+                        if playing:
+                            playing = False
+                        else:
+                            playing = True
+                            accumulated_time = False
+
+                    if event.key == pygame.K_UP:
+                        play_speed += 0.1
+
+                    if event.key == pygame.K_DOWN:
+                        play_speed -= 0.1
+                        if play_speed < 0.1:
+                            play_speed = 0.1
+                
+            cur_time = time.time()
+            delta_t = cur_time - start_time
+            start_time = cur_time
+
+            if playing:
+                accumulated_time += delta_t * play_speed
+
+                while accumulated_time > state_time:
+                    cur_state = cur_state + 1
+                    if cur_state == len(states):
+                        cur_state = 0
+
+                    accumulated_time -= state_time
+            
+            state_info = "{:.2f} / {}".format(cur_state / 4, len(states) // 4)
+            speed_info = "Speed: {:.1f}".format(play_speed)
+            
+            self.draw(states[cur_state], state_info, speed_info)
+
+    
